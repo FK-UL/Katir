@@ -9,6 +9,6 @@ For use with the Programming 1 course offered by the Faculty of Mathematics and 
 
 ## Contact:
 krsteskifilip05@gmail.com
-
+## 
 ***Currently this program is mainly for personal use, I am aware of various pitfalls and issues that may or may not arrise,
 hopefully in the near future it will have a working UI interface and some other things.***
