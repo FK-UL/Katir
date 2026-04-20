@@ -5,10 +5,7 @@ For use with the Programming 1 course offered by the Faculty of Mathematics and 
 ## How to use:
 1. Download the .zip of the code or clone the repository.
 2. Make sure all the files remain in the same folder
-3. Run katir.py and use '2. Update' if it's your first time using.
+3. Run 'katir.py'
 
 ## Contact:
 krsteskifilip05@gmail.com
-## 
-***Currently this program is mainly for personal use, I am aware of various pitfalls and issues that may or may not arrise,
-hopefully in the near future it will have a working UI interface and some other things.***
