@@ -1,32 +1,39 @@
-import requests
+import requests, pickle
 from bs4 import BeautifulSoup
 
+data = {}  # We save the data in the format <problem_name>: <difficulty>
+i = 1
 
-names = set()  # set to filter duplicates and for quick lookup
-for i in range(1, 59):
-    url = f'https://open.kattis.com/problems?page={i}' 
-    # values >59 also return a response despite containing no problem data
-    # this was the best i could do, probably will just manually update for now
-    # when new tasks are added to kattis and the number of pages increases
-
-    # ...probably can just add a check for a specific element on the empty pages to break the loop
-    # too lazy to do that now, TODO in the future.
+while True:
+    # Scrape each html page individually
+    url = f'https://open.kattis.com/problems?page={i}'
     kattis = requests.get(url)
     soup = BeautifulSoup(kattis.text, 'lxml')
+    changes_made = False
+ 
+    rows = soup.select('tbody tr')
 
-    for url in soup.find_all('a'):
-        new_url = url.get('href')
-        new_url = str(new_url)
-        new_url = new_url.split('/')
+    for row in rows:  # We go by each 'row' i.e problem to get the name and difficulty
+        name_tag = row.select_one('td a')
+        name = name_tag.get_text(strip=True) if name_tag else None
 
-        if len(new_url) >= 3 and 'problems' in new_url:
-            new_url = f'{new_url[2]}'
-            names.add(new_url)
+        diff_tag = row.select_one('span.difficulty_number')
+        difficulty = diff_tag.get_text(strip=True) if diff_tag else None
 
-problems = open('Problems.txt', 'w')
-problems.write(str(names))
-problems.close()
+        if name and difficulty:
+            try:
+                data[name] = float(difficulty)
+            except:  # To filter difficulty ranges (i.e difficulties in the format 'x.y - w.z').
+                data[name] = float(difficulty[:3])  # As per the rules, the lower bound is taken.
+            
+            changes_made = True
+
+    if changes_made == False:  # Pages out of range don't return 404
+                               # instead they just contain no data
+        break
+
+    i += 1
 
 
-
-
+with open('Problems.pkl', 'wb') as p:  # Writing as binary to be able to save as dict()
+    pickle.dump(data, p)

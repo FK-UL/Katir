@@ -1,0 +1,9 @@
+# 0.1.0:
+First major Katir update:
+- Fixed file reading and writing (which broke the logic)
+- Changes to name lookup and how names are stored
+- Added lookup by difficulty range
+- Removed redundant files
+- Minor bug fixes
+# 0.0.1:
+First initial Katir release.

@@ -1,38 +1,62 @@
-print(
-    "Welcome!\n If this is your first time using the program, please use '2. Update'\n \
-to update the directory of current open Kattis problems. Afterwards, I would\n \
-recommend updating it every few weeks or once a month. It takes around 2-3 minutes.\n \
-..."
-)
+import pickle
 
-while True:
-    choice = input("Select an option (number): \n \
-    1. Problem lookup\n \
-    2. Update\n \
-    3. Exit\n")
 
-    if choice == '1':
-        while True:
-            import get_reservations  # Adds a slight delay, but it's to avoid the possibility of a wrong answer
-            r = open('Reservations.txt')
-            p = open('Problems.txt')
-            reservations = r.read()
-            problems = p.read()
+print('Welcome to Katir!')  # Refresh reservations upon each launch to ensure functionality (adds 1-2s delay)
+import get_reservations
+with open("Reservations.pkl", "rb") as r:
+    reservations = pickle.load(r)
 
-            name = input("Enter the name of the problem (0 to go back): ")
-            if name == '0':
-                break
-            
-            if name in problems and name in reservations:
-                print("This problem is ALREADY reserved!\n")
-            elif name in problems and name not in reservations:
-                print("This problem is NOT reserved!\n")
-            elif name not in problems:
-                print("This problem does not exist! Check your spelling and follow the lookup guide!\n")
-    elif choice == '2':
-        import get_problems
-        print("The problem directory has been updated!\n")
-    elif choice == '3':
-        break
-    else:
-        print("Please enter a valid number!\n")
+
+try:  # Loads the problems dataset, if not present, generates it anew
+    with open("Problems.pkl", "rb") as p:
+        problems = pickle.load(p)
+except:
+    print('Could not find directory of available problems. Updating, please wait...')
+    print('(Takes around 2-3 minutes, depending on network speed.)')
+    import get_problems
+    with open("Problems.pkl", "rb") as p:
+        problems = pickle.load(p)
+
+try:
+    choice = int(input('Select an option:\n \
+          1. Available problems by difficulty\n \
+          2. Check problem availability\n \
+          3. Update problem directory\n'))
+except:
+    print('That is not a valid number!')
+
+
+if choice == 1:
+    print('Select the difficulty range you want to get\n\
+          available problems for (format: X Y (decimals allowed))')
+    numbers = input().split()
+    lower_bound = numbers[0]
+    upper_bound = numbers[1]  # This part can fail if the input does not have an empty space
+
+    try:
+        lower_bound = float(lower_bound)
+        upper_bound = float(upper_bound)
+    except:
+        print('Invalid input!')
+    
+    avail = []
+    for problem, difficulty in problems.items():
+        if problem not in reservations and lower_bound <= difficulty <= upper_bound:
+            avail.append((difficulty, problem))
+    
+    for dif, pro in sorted(avail):  # We save the pairs in a list, and print them out by order of difficulty
+        print(f'{pro}: {dif}T')
+    
+
+elif choice == 2:    
+    name = input("Enter the name of the problem:\n")
+
+    if name in problems and name in reservations:
+        print(f"{name} is ALREADY reserved!\n")
+    elif name in problems and name not in reservations:
+        print(f"{name} is NOT reserved!\n")
+    elif name not in problems:
+        print("This problem does not exist! Check your spelling and follow the lookup guide!\n")
+
+elif choice == 3:  # Updates the problems database.
+    import get_problems
